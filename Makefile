@@ -5,9 +5,9 @@ coverage:
 	@./node_modules/.bin/mocha --require coverage.js --reporter html-cov > coverage.html
 
 build:
-	coffee --bare -c index.coffee src/*.coffee
+	coffee --bare -c *.coffee
 	
 clean:
-	rm -rf src/*.js index.js
+	rm -rf index.js builder.js
 
 .PHONY: test coverage

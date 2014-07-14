@@ -1,4 +1,4 @@
-UnicodeTrie = require './UnicodeTrie'
+UnicodeTrie = require './'
 
 class UnicodeTrieBuilder
   # Shift size for getting the index-1 table offset.

@@ -1,5 +1,5 @@
 assert = require 'assert'
-UnicodeTrieBuilder = require '../src/UnicodeTrieBuilder'
+UnicodeTrieBuilder = require '../builder'
 
 describe 'unicode trie', ->
   it 'set', ->
