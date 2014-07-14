@@ -11,6 +11,8 @@
     "coffee-coverage": "^0.4.2"
   },
   "scripts": {
+    "prepublish": "make build",
+    "postpublish": "make clean",
     "test": "mocha"
   },
   "repository": {

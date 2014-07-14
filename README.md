@@ -62,7 +62,7 @@ fs.writeFile 'trie.json', JSON.stringify(trie)
 
 Once you've built a precompiled trie, you can load it into the
 `UnicodeTrie` class, which is a readonly representation of the
-trie.  From there, you can lookup values in the trie.
+trie.  From there, you can lookup values.
 
 ```coffeescript
 {UnicodeTrie} = require 'unicode-trie'
