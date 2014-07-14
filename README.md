@@ -30,7 +30,7 @@ for faster runtime performance.  To build a Unicode Trie, use the
 `UnicodeTrieBuilder` class.
 
 ```coffeescript
-{UnicodeTrieBuilder} = require 'unicode-trie'
+UnicodeTrieBuilder = require 'unicode-trie/builder'
 
 # create a trie
 t = new UnicodeTrieBuilder
@@ -60,7 +60,7 @@ Once you've built a precompiled trie, you can load it into the
 trie.  From there, you can lookup values.
 
 ```coffeescript
-{UnicodeTrie} = require 'unicode-trie'
+UnicodeTrie = require 'unicode-trie'
 
 # load trie from JSON file
 json = require './trie.json'
