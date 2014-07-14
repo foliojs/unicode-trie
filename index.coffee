@@ -93,5 +93,13 @@ class UnicodeTrie
       return @data[index]
 
     return @data[@data.length - DATA_GRANULARITY]
+    
+  toJSON: ->
+    res = 
+      data: [@data...]
+      highStart: @highStart
+      errorValue: @errorValue
+      
+    return res
 
 module.exports = UnicodeTrie
