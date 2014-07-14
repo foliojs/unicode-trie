@@ -1,4 +1,4 @@
-Trie = require './UnicodeTrie'
+UnicodeTrie = require './UnicodeTrie'
 
 class UnicodeTrieBuilder
   # Shift size for getting the index-1 table offset.
@@ -771,7 +771,7 @@ class UnicodeTrieBuilder
     for i in [0...@dataLength] by 1
       data[destIdx++] = @data[i]
       
-    dest = new Trie
+    dest = new UnicodeTrie
       data: data
       highStart: @highStart
       errorValue: @errorValue

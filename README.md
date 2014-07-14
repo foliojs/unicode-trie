@@ -19,11 +19,6 @@ and flattened trie, which is then used at runtime to lookup the necessary
 data.  According to my own tests, this is generally at least 50% faster
 than binary search, with not too much additional memory required.
 
-Check out the following resources for more information (a little old but still useful):
-
-* [Bits of Unicode](http://macchiato.com/slides/Bits_of_Unicode.ppt)
-* [Folded Trie: Efficient Data Structure for All of Unicode ](http://icu-project.org/docs/papers/foldedtrie_iuc21.ppt)
-
 ## Installation
 
     npm install unicode-trie
