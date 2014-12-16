@@ -1,4 +1,5 @@
 UnicodeTrie = require './'
+pako = require 'pako'
 
 class UnicodeTrieBuilder
   # Shift size for getting the index-1 table offset.
@@ -782,5 +783,28 @@ class UnicodeTrieBuilder
       errorValue: @errorValue
 
     return dest
+
+  # Generates a Buffer containing the serialized and compressed trie.
+  # Trie data is compressed twice using the deflate algorithm to minimize file size.
+  # Format:
+  #   uint32_t highStart;
+  #   uint32_t errorValue;
+  #   uint32_t dataLength;
+  #   uint8_t trieData[dataLength];
+  toBuffer: ->
+    trie = @freeze()
+
+    data = new Uint8Array(trie.data.buffer)
+    data = pako.deflateRaw data
+    data = pako.deflateRaw data
+
+    buf = new Buffer data.length + 12
+    buf.writeUInt32BE trie.highStart, 0
+    buf.writeUInt32BE trie.errorValue, 4
+    buf.writeUInt32BE data.length, 8
+    for b, i in data
+      buf[i + 12] = b
+
+    return buf
 
 module.exports = UnicodeTrieBuilder

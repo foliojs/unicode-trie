@@ -1,5 +1,6 @@
 assert = require 'assert'
 UnicodeTrieBuilder = require '../builder'
+UnicodeTrie = require '../'
 
 describe 'unicode trie', ->
   it 'set', ->
@@ -39,6 +40,21 @@ describe 'unicode trie', ->
     t.setRange 6000, 7000, 9900, true
     
     trie = t.freeze()
+    assert.equal trie.get(12), 10
+    assert.equal trie.get(13), 7788
+    assert.equal trie.get(5999), 7788
+    assert.equal trie.get(6000), 9900
+    assert.equal trie.get(7000), 9900
+    assert.equal trie.get(7001), 10
+    assert.equal trie.get(0x110000), 666
+    
+  it 'should work with compressed serialization format', ->
+    t = new UnicodeTrieBuilder 10, 666
+    t.setRange 13, 6666, 7788, false
+    t.setRange 6000, 7000, 9900, true
+    
+    buf = t.toBuffer()
+    trie = new UnicodeTrie buf
     assert.equal trie.get(12), 10
     assert.equal trie.get(13), 7788
     assert.equal trie.get(5999), 7788
@@ -200,4 +216,4 @@ describe 'unicode trie', ->
         for start in [start...check[0]] by 1
           assert.equal trie.get(start), check[1]
           assert.equal frozen.get(start), check[1]
-          
+                    

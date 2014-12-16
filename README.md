@@ -49,8 +49,8 @@ t.get 0x4567 # => 99
 # get a compiled trie (returns a UnicodeTrie object)
 trie = t.freeze()
 
-# write to JSON file
-fs.writeFile 'trie.json', JSON.stringify(trie)
+# write compressed trie to a binary file
+fs.writeFile 'data.trie', t.toBuffer()
 ```
 
 ## Using a precompiled Trie
@@ -61,10 +61,11 @@ trie.  From there, you can lookup values.
 
 ```coffeescript
 UnicodeTrie = require 'unicode-trie'
+fs = require 'fs'
 
-# load trie from JSON file
-json = require './trie.json'
-trie = new UnicodeTrie json
+# load serialized trie from binary file
+data = fs.readFileSync 'data.trie'
+trie = new UnicodeTrie data
 
 # lookup a value
 trie.get 0x4567 # => 99

@@ -1,3 +1,5 @@
+pako = require 'pako/lib/inflate'
+
 class UnicodeTrie
   # Shift size for getting the index-1 table offset.
   SHIFT_1 = 6 + 5
@@ -61,10 +63,21 @@ class UnicodeTrie
   # The alignment size of a data block. Also the granularity for compaction.
   DATA_GRANULARITY = 1 << INDEX_SHIFT
 
-  constructor: (json = {}) ->
-    @data = json.data or []
-    @highStart = json.highStart ? 0
-    @errorValue = json.errorValue ? -1
+  constructor: (data) ->
+    if Buffer.isBuffer(data)
+      # read binary format
+      @highStart = data.readUInt32BE 0
+      @errorValue = data.readUInt32BE 4
+      length = data.readUInt32BE 8
+      data = data.slice 12
+      
+      # double inflate the actual trie data
+      data = pako.inflateRaw data
+      data = pako.inflateRaw data
+      @data = new Uint32Array data.buffer
+    else
+      # pre-parsed data
+      {@data, @highStart, @errorValue} = data
 
   get: (codePoint) ->
     if codePoint < 0 or codePoint > 0x10ffff
@@ -94,12 +107,4 @@ class UnicodeTrie
 
     return @data[@data.length - DATA_GRANULARITY]
     
-  toJSON: ->
-    res = 
-      data: [@data...]
-      highStart: @highStart
-      errorValue: @errorValue
-      
-    return res
-
 module.exports = UnicodeTrie
