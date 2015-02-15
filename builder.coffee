@@ -789,20 +789,20 @@ class UnicodeTrieBuilder
   # Format:
   #   uint32_t highStart;
   #   uint32_t errorValue;
-  #   uint32_t dataLength;
+  #   uint32_t uncompressedDataLength;
   #   uint8_t trieData[dataLength];
   toBuffer: ->
     trie = @freeze()
 
     data = new Uint8Array(trie.data.buffer)
-    data = pako.deflateRaw data
-    data = pako.deflateRaw data
+    compressed = pako.deflateRaw data
+    compressed = pako.deflateRaw compressed
 
-    buf = new Buffer data.length + 12
+    buf = new Buffer compressed.length + 12
     buf.writeUInt32BE trie.highStart, 0
     buf.writeUInt32BE trie.errorValue, 4
     buf.writeUInt32BE data.length, 8
-    for b, i in data
+    for b, i in compressed
       buf[i + 12] = b
 
     return buf
