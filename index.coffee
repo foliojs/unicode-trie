@@ -1,4 +1,4 @@
-pako = require 'pako/lib/inflate'
+inflate = require 'tiny-inflate'
 
 class UnicodeTrie
   # Shift size for getting the index-1 table offset.
@@ -64,17 +64,27 @@ class UnicodeTrie
   DATA_GRANULARITY = 1 << INDEX_SHIFT
 
   constructor: (data) ->
-    if Buffer.isBuffer(data)
+    isBuffer = typeof data.readUInt32BE is 'function' and typeof data.slice is 'function'
+    
+    if isBuffer or data instanceof Uint8Array
       # read binary format
-      @highStart = data.readUInt32BE 0
-      @errorValue = data.readUInt32BE 4
-      length = data.readUInt32BE 8
-      data = data.slice 12
-      
+      if isBuffer
+        @highStart = data.readUInt32BE 0
+        @errorValue = data.readUInt32BE 4
+        uncompressedLength = data.readUInt32BE 8
+        data = data.slice 12
+      else
+        view = new DataView data.buffer
+        @highStart = view.getUint32 0
+        @errorValue = view.getUint32 4
+        uncompressedLength = view.getUint32 8
+        data = data.subarray 12
+
       # double inflate the actual trie data
-      data = pako.inflateRaw data
-      data = pako.inflateRaw data
+      data = inflate data, new Uint8Array uncompressedLength
+      data = inflate data, new Uint8Array uncompressedLength
       @data = new Uint32Array data.buffer
+    
     else
       # pre-parsed data
       {@data, @highStart, @errorValue} = data
