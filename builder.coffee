@@ -575,7 +575,7 @@ class UnicodeTrieBuilder
         continue
 
       # search for an identical block
-      if (movedStart = @_findSameDataBlock(@data, newStart, start, blockLength)) >= 0
+      if (movedStart = @_findSameDataBlock(newStart, start, blockLength)) >= 0
         # found an identical block, set the other block's index value for the current block
         mapIndex = start >> SHIFT_2
         for i in [blockCount...0] by -1
@@ -591,7 +591,7 @@ class UnicodeTrieBuilder
       # see if the beginning of this block can be overlapped with the end of the previous block
       # look for maximum overlap (modulo granularity) with the previous, adjacent block
       overlap = blockLength - DATA_GRANULARITY
-      while overlap > 0 and not equal_int(@data, (newStart - overlap), @data, start, overlap)
+      while overlap > 0 and not equal_int(@data, (newStart - overlap), start, overlap)
         overlap -= DATA_GRANULARITY
 
       if overlap > 0 or newStart < start
@@ -650,7 +650,7 @@ class UnicodeTrieBuilder
       #           (right after current end of already-compacted data)
 
       # search for an identical block
-      if (movedStart = @_findSameIndex2Block(@index2, newStart, start)) >= 0
+      if (movedStart = @_findSameIndex2Block(newStart, start)) >= 0
         # found an identical block, set the other block's index value for the current block
         @map[start >> SHIFT_1_2] = movedStart
 
@@ -663,7 +663,7 @@ class UnicodeTrieBuilder
       # see if the beginning of this block can be overlapped with the end of the previous block
       # look for maximum overlap with the previous, adjacent block
       overlap = INDEX_2_BLOCK_LENGTH - 1
-      while overlap > 0 and not equal_int(@index2, (newStart - overlap), @index2, start, overlap)
+      while overlap > 0 and not equal_int(@index2, (newStart - overlap), start, overlap)
         --overlap
 
       if overlap > 0 or newStart < start
