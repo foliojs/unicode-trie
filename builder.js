@@ -110,7 +110,8 @@ const MEDIUM_DATA_LENGTH = 1 << 17;
 // Maximum length of the runtime data array.
 // Limited by 16-bit index values that are left-shifted by INDEX_SHIFT,
 // and by uint16_t UTrie2Header.shiftedDataLength.
-const MAX_DATA_LENGTH = 0xffff << INDEX_SHIFT;
+// TODO: The constant is declared twice. Why? (used is last)
+//const MAX_DATA_LENGTH = 0xffff << INDEX_SHIFT;
 
 const INDEX_1_LENGTH = 0x110000 >> SHIFT_1;
 
