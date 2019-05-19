@@ -1,8 +1,6 @@
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
- * DS202: Simplify dynamic range loops
- * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const UnicodeTrie = require('./');
@@ -147,7 +145,7 @@ const INDEX_2_START_OFFSET = INDEX_2_NULL_OFFSET + INDEX_2_BLOCK_LENGTH;
 const MAX_INDEX_LENGTH = 0xffff;
 
 const equal_int = (a, s, t, length) => {
-  for (let i = 0, end = length; i < end; i++) {
+  for (let i = 0; i < length; i++) {
     if (a[s + i] !== a[t + i]) { return false; }
   }
 
@@ -157,16 +155,6 @@ const equal_int = (a, s, t, length) => {
 class UnicodeTrieBuilder {
   constructor(initialValue, errorValue) {
     let i, j;
-    let end;
-    let step;
-    let asc, step1;
-    let asc1, end1, step2;
-    let end2;
-    let end3;
-    let end4;
-    let end5;
-    let end6;
-    let step3;
     if (initialValue == null) { initialValue = 0; }
     this.initialValue = initialValue;
     if (errorValue == null) { errorValue = 0; }
@@ -204,7 +192,7 @@ class UnicodeTrieBuilder {
       this.data[i] = this.errorValue;
     }
 
-    for (i = DATA_NULL_OFFSET, end = NEW_DATA_START_OFFSET; i < end; i++) {
+    for (i = DATA_NULL_OFFSET; i < NEW_DATA_START_OFFSET; i++) {
       this.data[i] = this.initialValue;
     }
 
@@ -213,13 +201,13 @@ class UnicodeTrieBuilder {
 
     // set the index-2 indexes for the 2=0x80>>SHIFT_2 ASCII data blocks
     i = 0;
-    for (j = 0, step = DATA_BLOCK_LENGTH; j < 0x80; j += step) {
+    for (j = 0; j < 0x80; j += DATA_BLOCK_LENGTH) {
       this.index2[i] = j;
       this.map[i++] = 1;
     }
 
     // reference counts for the bad-UTF-8-data block
-    for (j = j, step1 = DATA_BLOCK_LENGTH, asc = step1 > 0; asc ? j < 0xc0 : j > 0xc0; j += step1) {
+    for (j = j; j < 0xc0; j += DATA_BLOCK_LENGTH) {
       this.map[i++] = 0;
     }
 
@@ -229,24 +217,24 @@ class UnicodeTrieBuilder {
     // i==newTrie->dataNullOffset
     this.map[i++] = ((0x110000 >> SHIFT_2) - (0x80 >> SHIFT_2)) + 1 + LSCP_INDEX_2_LENGTH;
     j += DATA_BLOCK_LENGTH;
-    for (j = j, end1 = NEW_DATA_START_OFFSET, step2 = DATA_BLOCK_LENGTH, asc1 = step2 > 0; asc1 ? j < end1 : j > end1; j += step2) {
+    for (j = j; j < NEW_DATA_START_OFFSET; j += DATA_BLOCK_LENGTH) {
       this.map[i++] = 0;
     }
 
     // set the remaining indexes in the BMP index-2 block
     // to the null data block
-    for (i = 0x80 >> SHIFT_2, end2 = INDEX_2_BMP_LENGTH; i < end2; i++) {
+    for (i = 0x80 >> SHIFT_2; i < INDEX_2_BMP_LENGTH; i++) {
       this.index2[i] = DATA_NULL_OFFSET;
     }
 
     // Fill the index gap with impossible values so that compaction
     // does not overlap other index-2 blocks with the gap.
-    for (i = 0, end3 = INDEX_GAP_LENGTH; i < end3; i++) {
+    for (i = 0; i < INDEX_GAP_LENGTH; i++) {
       this.index2[INDEX_GAP_OFFSET + i] = -1;
     }
 
     // set the indexes in the null index-2 block
-    for (i = 0, end4 = INDEX_2_BLOCK_LENGTH; i < end4; i++) {
+    for (i = 0; i < INDEX_2_BLOCK_LENGTH; i++) {
       this.index2[INDEX_2_NULL_OFFSET + i] = DATA_NULL_OFFSET;
     }
 
@@ -255,20 +243,20 @@ class UnicodeTrieBuilder {
 
     // set the index-1 indexes for the linear index-2 block
     j = 0;
-    for (i = 0, end5 = OMITTED_BMP_INDEX_1_LENGTH; i < end5; i++) {
+    for (i = 0; i < OMITTED_BMP_INDEX_1_LENGTH; i++) {
       this.index1[i] = j;
       j += INDEX_2_BLOCK_LENGTH;
     }
 
     // set the remaining index-1 indexes to the null index-2 block
-    for (i = i, end6 = INDEX_1_LENGTH; i < end6; i++) {
+    for (i = i; i < INDEX_1_LENGTH; i++) {
       this.index1[i] = INDEX_2_NULL_OFFSET;
     }
 
     // Preallocate and reset data for U+0080..U+07ff,
     // for 2-byte UTF-8 which will be compacted in 64-blocks
     // even if DATA_BLOCK_LENGTH is smaller.
-    for (i = 0x80, step3 = DATA_BLOCK_LENGTH; i < 0x800; i += step3) {
+    for (i = 0x80; i < 0x800; i += DATA_BLOCK_LENGTH) {
       this.set(i, this.initialValue);
     }
 
@@ -536,13 +524,11 @@ class UnicodeTrieBuilder {
   _fillBlock(block, start, limit, value, initialValue, overwrite) {
     let i;
     if (overwrite) {
-      let end;
-      for (i = block + start, end = block + limit; i < end; i++) {
+      for (i = block + start; i < block + limit; i++) {
         this.data[i] = value;
       }
     } else {
-      let end1;
-      for (i = block + start, end1 = block + limit; i < end1; i++) {
+      for (i = block + start; i < block + limit; i++) {
         if (this.data[i] === initialValue) {
           this.data[i] = value;
         }
@@ -640,7 +626,7 @@ class UnicodeTrieBuilder {
   _findSameIndex2Block(index2Length, otherBlock) {
     // ensure that we do not even partially get past index2Length
     index2Length -= INDEX_2_BLOCK_LENGTH;
-    for (let block = 0, end = index2Length; block <= end; block++) {
+    for (let block = 0; block <= index2Length; block++) {
       if (equal_int(this.index2, block, otherBlock, INDEX_2_BLOCK_LENGTH)) { return block; }
     }
 
@@ -750,7 +736,6 @@ class UnicodeTrieBuilder {
 
   _compactIndex2() {
     // do not compact linear-BMP index-2 blocks
-    let end;
     let newStart = INDEX_2_BMP_LENGTH;
     let start = 0;
     let i = 0;
@@ -806,7 +791,7 @@ class UnicodeTrieBuilder {
     }
 
     // now adjust the index-1 table
-    for (i = 0, end = INDEX_1_LENGTH; i < end; i++) {
+    for (i = 0; i < INDEX_1_LENGTH; i++) {
       this.index1[i] = this.map[this.index1[i] >> SHIFT_1_2];
     }
 
@@ -861,10 +846,6 @@ class UnicodeTrieBuilder {
 
   freeze() {
     let allIndexesLength, i;
-    let end;
-    let end1;
-    let end2;
-    let end5;
     if (!this.isCompacted) {
       this._compact();
     }
@@ -891,39 +872,37 @@ class UnicodeTrieBuilder {
 
     // write the index-2 array values shifted right by INDEX_SHIFT, after adding dataMove
     let destIdx = 0;
-    for (i = 0, end = INDEX_2_BMP_LENGTH; i < end; i++) {
+    for (i = 0; i < INDEX_2_BMP_LENGTH; i++) {
       data[destIdx++] = ((this.index2[i] + dataMove) >> INDEX_SHIFT);
     }
 
     // write UTF-8 2-byte index-2 values, not right-shifted
-    for (i = 0, end1 = 0xc2 - 0xc0; i < end1; i++) { // C0..C1
+    for (i = 0; i < 0xc2 - 0xc0; i++) { // C0..C1
       data[destIdx++] = (dataMove + BAD_UTF8_DATA_OFFSET);
     }
 
-    for (i = i, end2 = 0xe0 - 0xc0; i < end2; i++) { // C2..DF
+    for (i = i; i < 0xe0 - 0xc0; i++) { // C2..DF
       data[destIdx++] = (dataMove + this.index2[i << (6 - SHIFT_2)]);
     }
 
     if (this.highStart > 0x10000) {
-      let end3;
-      let end4;
       const index1Length = (this.highStart - 0x10000) >> SHIFT_1;
       const index2Offset = INDEX_2_BMP_LENGTH + UTF8_2B_INDEX_2_LENGTH + index1Length;
 
       // write 16-bit index-1 values for supplementary code points
-      for (i = 0, end3 = index1Length; i < end3; i++) {
+      for (i = 0; i < index1Length; i++) {
         data[destIdx++] = (INDEX_2_OFFSET + this.index1[i + OMITTED_BMP_INDEX_1_LENGTH]);
       }
 
       // write the index-2 array values for supplementary code points,
       // shifted right by INDEX_SHIFT, after adding dataMove
-      for (i = 0, end4 = this.index2Length - index2Offset; i < end4; i++) {
+      for (i = 0; i < this.index2Length - index2Offset; i++) {
         data[destIdx++] = ((dataMove + this.index2[index2Offset + i]) >> INDEX_SHIFT);
       }
     }
 
     // write 16-bit data values
-    for (i = 0, end5 = this.dataLength; i < end5; i++) {
+    for (i = 0; i < this.dataLength; i++) {
       data[destIdx++] = this.data[i];
     }
 
