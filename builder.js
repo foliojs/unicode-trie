@@ -1,8 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const UnicodeTrie = require('./');
 const pako = require('pako');
 
@@ -493,7 +488,7 @@ class UnicodeTrieBuilder {
   _releaseDataBlock(block) {
     // put this block at the front of the free-block chain
     this.map[block >> SHIFT_2] = -this.firstFreeBlock;
-    return this.firstFreeBlock = block;
+    this.firstFreeBlock = block;
   }
 
   _setIndex2Entry(i2, block) {
@@ -503,7 +498,7 @@ class UnicodeTrieBuilder {
       this._releaseDataBlock(oldBlock);
     }
 
-    return this.index2[i2] = block;
+    this.index2[i2] = block;
   }
 
   _getDataBlock(c, forLSCP) {
@@ -534,7 +529,6 @@ class UnicodeTrieBuilder {
         }
       }
     }
-
   }
 
   _writeBlock(block, value) {
@@ -542,7 +536,6 @@ class UnicodeTrieBuilder {
     while (block < limit) {
       this.data[block++] = value;
     }
-
   }
 
   _findHighStart(highValue) {
@@ -807,7 +800,7 @@ class UnicodeTrieBuilder {
       this.index2[newStart++] = 0x0000ffff << INDEX_SHIFT;
     }
 
-    return this.index2Length = newStart;
+    this.index2Length = newStart;
   }
 
   _compact() {
@@ -841,7 +834,7 @@ class UnicodeTrieBuilder {
       this.data[this.dataLength++] = this.initialValue;
     }
 
-    return this.isCompacted = true;
+    this.isCompacted = true;
   }
 
   freeze() {
