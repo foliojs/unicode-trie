@@ -1,25 +1,18 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const assert = require('assert');
 const UnicodeTrieBuilder = require('../builder');
 const UnicodeTrie = require('../');
 
-describe('unicode trie', function() {
-  it('set', function() {
+describe('unicode trie', () => {
+  it('set', () => {
     const trie = new UnicodeTrieBuilder(10, 666);
     trie.set(0x4567, 99);
     assert.equal(trie.get(0x4566), 10);
     assert.equal(trie.get(0x4567), 99);
     assert.equal(trie.get(-1), 666);
-    return assert.equal(trie.get(0x110000), 666);
+    assert.equal(trie.get(0x110000), 666);
   });
 
-  it('set -> compacted trie', function() {
+  it('set -> compacted trie', () => {
     const t = new UnicodeTrieBuilder(10, 666);
     t.set(0x4567, 99);
 
@@ -27,10 +20,10 @@ describe('unicode trie', function() {
     assert.equal(trie.get(0x4566), 10);
     assert.equal(trie.get(0x4567), 99);
     assert.equal(trie.get(-1), 666);
-    return assert.equal(trie.get(0x110000), 666);
+    assert.equal(trie.get(0x110000), 666);
   });
 
-  it('setRange', function() {
+  it('setRange', () => {
     const trie = new UnicodeTrieBuilder(10, 666);
     trie.setRange(13, 6666, 7788, false);
     trie.setRange(6000, 7000, 9900, true);
@@ -41,10 +34,10 @@ describe('unicode trie', function() {
     assert.equal(trie.get(6000), 9900);
     assert.equal(trie.get(7000), 9900);
     assert.equal(trie.get(7001), 10);
-    return assert.equal(trie.get(0x110000), 666);
+    assert.equal(trie.get(0x110000), 666);
   });
 
-  it('setRange -> compacted trie', function() {
+  it('setRange -> compacted trie', () => {
     const t = new UnicodeTrieBuilder(10, 666);
     t.setRange(13, 6666, 7788, false);
     t.setRange(6000, 7000, 9900, true);
@@ -56,10 +49,10 @@ describe('unicode trie', function() {
     assert.equal(trie.get(6000), 9900);
     assert.equal(trie.get(7000), 9900);
     assert.equal(trie.get(7001), 10);
-    return assert.equal(trie.get(0x110000), 666);
+    assert.equal(trie.get(0x110000), 666);
   });
 
-  it('should work with compressed serialization format', function() {
+  it('should work with compressed serialization format', () => {
     const t = new UnicodeTrieBuilder(10, 666);
     t.setRange(13, 6666, 7788, false);
     t.setRange(6000, 7000, 9900, true);
@@ -72,7 +65,7 @@ describe('unicode trie', function() {
     assert.equal(trie.get(6000), 9900);
     assert.equal(trie.get(7000), 9900);
     assert.equal(trie.get(7001), 10);
-    return assert.equal(trie.get(0x110000), 666);
+    assert.equal(trie.get(0x110000), 666);
   });
 
   const rangeTests = [
@@ -206,40 +199,36 @@ describe('unicode trie', function() {
     }
   ];
 
-  return it('should pass range tests', () =>
-    (() => {
-      const result = [];
-      for (let test of Array.from(rangeTests)) {
-        let initialValue = 0;
-        let errorValue = 0x0bad;
-        let i = 0;
-        if (test.ranges[i][1] < 0) {
-          errorValue = test.ranges[i][2];
-          i++;
-        }
-
-        initialValue = test.ranges[i++][2];
-        var trie = new UnicodeTrieBuilder(initialValue, errorValue);
-
-        for (let range of Array.from(test.ranges.slice(i))) {
-          trie.setRange(range[0], range[1] - 1, range[2], range[3] !== 0);
-        }
-
-        var frozen = trie.freeze();
-
-        var start = 0;
-        result.push(Array.from(test.check).map((check) =>
-          (() => {
-            let end;
-            const result1 = [];
-            for (start = start, end = check[0]; start < end; start++) {
-              assert.equal(trie.get(start), check[1]);
-              result1.push(assert.equal(frozen.get(start), check[1]));
-            }
-            return result1;
-          })()));
+  it('should pass range tests', () => {
+    const result = [];
+    for (let test of rangeTests) {
+      let initialValue = 0;
+      let errorValue = 0x0bad;
+      let i = 0;
+      if (test.ranges[i][1] < 0) {
+        errorValue = test.ranges[i][2];
+        i++;
       }
-      return result;
-    })()
-);
+
+      initialValue = test.ranges[i++][2];
+      var trie = new UnicodeTrieBuilder(initialValue, errorValue);
+
+      for (let range of test.ranges.slice(i)) {
+        trie.setRange(range[0], range[1] - 1, range[2], range[3] !== 0);
+      }
+
+      var frozen = trie.freeze();
+
+      var start = 0;
+      result.push(test.check.map((check) => {
+        let end;
+        const result1 = [];
+        for (start = start, end = check[0]; start < end; start++) {
+          assert.equal(trie.get(start), check[1]);
+          result1.push(assert.equal(frozen.get(start), check[1]));
+        }
+        return result1;
+      }));
+    }
+  });
 });
