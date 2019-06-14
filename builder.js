@@ -103,15 +103,14 @@ const MEDIUM_DATA_LENGTH = 1 << 17;
 // Maximum length of the runtime data array.
 // Limited by 16-bit index values that are left-shifted by INDEX_SHIFT,
 // and by uint16_t UTrie2Header.shiftedDataLength.
-// TODO: The constant is declared twice. Why? (used is last)
-//const MAX_DATA_LENGTH = 0xffff << INDEX_SHIFT;
+const MAX_DATA_LENGTH_RUNTIME = 0xffff << INDEX_SHIFT;
 
 const INDEX_1_LENGTH = 0x110000 >> SHIFT_1;
 
 // Maximum length of the build-time data array.
 // One entry per 0x110000 code points, plus the illegal-UTF-8 block and the null block,
 // plus values for the 0x400 surrogate code units.
-const MAX_DATA_LENGTH = 0x110000 + 0x40 + 0x40 + 0x400;
+const MAX_DATA_LENGTH_BUILDTIME = 0x110000 + 0x40 + 0x40 + 0x400;
 
 // At build time, leave a gap in the index-2 table,
 // at least as long as the maximum lengths of the 2-byte UTF-8 index-2 table
@@ -177,7 +176,7 @@ class UnicodeTrieBuilder {
     //
     // Map of adjusted indexes, used in compactData() and compactIndex2().
     // Maps from original indexes to new ones.
-    this.map = new Int32Array(MAX_DATA_LENGTH >> SHIFT_2);
+    this.map = new Int32Array(MAX_DATA_LENGTH_BUILDTIME >> SHIFT_2);
 
     for (i = 0; i < 0x80; i++) {
       this.data[i] = this.initialValue;
@@ -462,11 +461,11 @@ class UnicodeTrieBuilder {
         let capacity;
         if (this.dataCapacity < MEDIUM_DATA_LENGTH) {
           capacity = MEDIUM_DATA_LENGTH;
-        } else if (this.dataCapacity < MAX_DATA_LENGTH) {
-          capacity = MAX_DATA_LENGTH;
+        } else if (this.dataCapacity < MAX_DATA_LENGTH_BUILDTIME) {
+          capacity = MAX_DATA_LENGTH_BUILDTIME;
         } else {
           // Should never occur.
-          // Either MAX_DATA_LENGTH is incorrect,
+          // Either MAX_DATA_LENGTH_BUILDTIME is incorrect,
           // or the code writes more values than should be possible.
           throw new Error("Internal error in Trie2 creation.");
         }
@@ -851,11 +850,11 @@ class UnicodeTrieBuilder {
 
     const dataMove = allIndexesLength;
 
-    // for shiftedDataLength
-    if ((allIndexesLength > MAX_INDEX_LENGTH) ||
-      ((dataMove + this.dataNullOffset) > 0xffff) ||
-      ((dataMove + DATA_0800_OFFSET) > 0xffff) ||
-      ((dataMove + this.dataLength) > MAX_DATA_LENGTH)) {
+    // are indexLength and dataLength within limits?
+    if ((allIndexesLength > MAX_INDEX_LENGTH) || // for unshifted indexLength
+      ((dataMove + this.dataNullOffset) > 0xffff) || // for unshifted dataNullOffset
+      ((dataMove + DATA_0800_OFFSET) > 0xffff) || // for unshifted 2-byte UTF-8 index-2 values
+      ((dataMove + this.dataLength) > MAX_DATA_LENGTH_RUNTIME)) { // for shiftedDataLength
       throw new Error("Trie data is too large.");
     }
 
