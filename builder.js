@@ -140,7 +140,9 @@ const MAX_INDEX_LENGTH = 0xffff;
 
 const equal_int = (a, s, t, length) => {
   for (let i = 0; i < length; i++) {
-    if (a[s + i] !== a[t + i]) { return false; }
+    if (a[s + i] !== a[t + i]) {
+      return false;
+    }
   }
 
   return true;
@@ -149,9 +151,13 @@ const equal_int = (a, s, t, length) => {
 class UnicodeTrieBuilder {
   constructor(initialValue, errorValue) {
     let i, j;
-    if (initialValue == null) { initialValue = 0; }
+    if (initialValue == null) {
+      initialValue = 0;
+    }
     this.initialValue = initialValue;
-    if (errorValue == null) { errorValue = 0; }
+    if (errorValue == null) {
+      errorValue = 0;
+    }
     this.errorValue = errorValue;
     this.index1 = new Int32Array(INDEX_1_LENGTH);
     this.index2 = new Int32Array(MAX_INDEX_2_LENGTH);
@@ -272,7 +278,9 @@ class UnicodeTrieBuilder {
 
   setRange(start, end, value, overwrite) {
     let block, repeatBlock;
-    if (overwrite == null) { overwrite = true; }
+    if (overwrite == null) {
+      overwrite = true;
+    }
     if ((start > 0x10ffff) || (end > 0x10ffff) || (start > end)) {
       throw new Error('Invalid code point');
     }
@@ -380,7 +388,9 @@ class UnicodeTrieBuilder {
 
   get(c, fromLSCP) {
     let i2;
-    if (fromLSCP == null) { fromLSCP = true; }
+    if (fromLSCP == null) {
+      fromLSCP = true;
+    }
     if ((c < 0) || (c > 0x10ffff)) {
       return this.errorValue;
     }
@@ -569,7 +579,9 @@ class UnicodeTrieBuilder {
       prevI2Block = i2Block;
       if (i2Block === index2NullOffset) {
         // this is the null index-2 block
-        if (highValue !== initialValue) { return c; }
+        if (highValue !== initialValue) {
+          return c;
+        }
         c -= CP_PER_INDEX_1_ENTRY;
       } else {
         // enumerate data blocks for one index-2 block
@@ -585,13 +597,17 @@ class UnicodeTrieBuilder {
           prevBlock = block;
           if (block === nullBlock) {
             // this is the null data block
-            if (highValue !== initialValue) { return c; }
+            if (highValue !== initialValue) {
+              return c;
+            }
             c -= DATA_BLOCK_LENGTH;
           } else {
             let j = DATA_BLOCK_LENGTH;
             while (j > 0) {
               const value = data32[block + --j];
-              if (value !== highValue) { return c; }
+              if (value !== highValue) {
+                return c;
+              }
               --c;
             }
           }
@@ -608,7 +624,9 @@ class UnicodeTrieBuilder {
     dataLength -= blockLength;
     let block = 0;
     while (block <= dataLength) {
-      if (equal_int(this.data, block, otherBlock, blockLength)) { return block; }
+      if (equal_int(this.data, block, otherBlock, blockLength)) {
+        return block;
+      }
       block += DATA_GRANULARITY;
     }
 
@@ -619,7 +637,9 @@ class UnicodeTrieBuilder {
     // ensure that we do not even partially get past index2Length
     index2Length -= INDEX_2_BLOCK_LENGTH;
     for (let block = 0; block <= index2Length; block++) {
-      if (equal_int(this.index2, block, otherBlock, INDEX_2_BLOCK_LENGTH)) { return block; }
+      if (equal_int(this.index2, block, otherBlock, INDEX_2_BLOCK_LENGTH)) {
+        return block;
+      }
     }
 
     return -1;
@@ -714,7 +734,9 @@ class UnicodeTrieBuilder {
     i = 0;
     while (i < this.index2Length) {
       // Gap indexes are invalid (-1). Skip over the gap.
-      if (i === INDEX_GAP_OFFSET) { i += INDEX_GAP_LENGTH; }
+      if (i === INDEX_GAP_OFFSET) {
+        i += INDEX_GAP_LENGTH;
+      }
       this.index2[i] = this.map[this.index2[i] >> SHIFT_2];
       ++i;
     }
@@ -722,7 +744,9 @@ class UnicodeTrieBuilder {
     this.dataNullOffset = this.map[this.dataNullOffset >> SHIFT_2];
 
     // ensure dataLength alignment
-    while ((newStart & (DATA_GRANULARITY - 1)) !== 0) { this.data[newStart++] = this.initialValue; }
+    while ((newStart & (DATA_GRANULARITY - 1)) !== 0) {
+      this.data[newStart++] = this.initialValue;
+    }
     this.dataLength = newStart;
   }
 
