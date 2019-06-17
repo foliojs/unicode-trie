@@ -52,6 +52,15 @@ describe('unicode trie', () => {
     assert.equal(trie.get(0x110000), 666);
   });
 
+  it('toBuffer written in big-endian', () => {
+    const trie = new UnicodeTrieBuilder();
+    trie.set(0x4567, 99);
+
+    const buf = trie.toBuffer();
+    const bufferExpected = new Buffer.from([0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 36, 128, 123, 123, 78, 145, 175, 193, 64, 192, 245, 224, 124, 45, 21, 161, 206, 39, 98, 79, 245, 98, 166, 44, 14, 188, 200, 210, 217, 172, 118, 198, 91, 109, 118, 232, 110, 207, 153, 147, 55, 153, 100, 111, 126, 122, 239, 191, 9, 99, 67, 225, 85, 198, 58, 6, 48, 144, 243, 77, 223, 94, 239, 28, 244, 190, 226, 247, 3, 86, 0]);
+    assert.equal(buf.toString('hex'), bufferExpected.toString('hex'));
+  });
+
   it('should work with compressed serialization format', () => {
     const t = new UnicodeTrieBuilder(10, 666);
     t.setRange(13, 6666, 7788, false);

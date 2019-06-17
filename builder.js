@@ -1,5 +1,6 @@
 const UnicodeTrie = require('./');
 const pako = require('pako');
+const { swap32BE } = require('./swap');
 
 // Shift size for getting the index-1 table offset.
 const SHIFT_1 = 6 + 5;
@@ -942,6 +943,10 @@ class UnicodeTrieBuilder {
     const trie = this.freeze();
 
     const data = new Uint8Array(trie.data.buffer);
+
+    // swap bytes to big-endian
+    swap32BE(data);
+
     let compressed = pako.deflateRaw(data);
     compressed = pako.deflateRaw(compressed);
 
