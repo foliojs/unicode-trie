@@ -31,6 +31,7 @@ for faster runtime performance.  To build a Unicode Trie, use the
 
 ```js
 const UnicodeTrieBuilder = require('unicode-trie/builder');
+const fs = require('fs');
 
 // create a trie
 let t = new UnicodeTrieBuilder();
@@ -50,7 +51,7 @@ t.get(0x4567); // => 99
 const trie = t.freeze();
 
 // write compressed trie to a binary file
-fs.writeFile('data.trie', t.toBuffer());
+fs.writeFileSync('data.trie', t.toBuffer());
 ```
 
 ## Using a precompiled Trie
