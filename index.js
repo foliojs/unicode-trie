@@ -85,7 +85,7 @@ class UnicodeTrie {
       // double inflate the actual trie data
       data = inflate(data, new Uint8Array(uncompressedLength));
       data = inflate(data, new Uint8Array(uncompressedLength));
-      this.data = new Uint32Array(data.buffer);
+      this.data = new DataView(data.buffer);
 
     } else {
       // pre-parsed data
@@ -103,8 +103,8 @@ class UnicodeTrie {
       // Ordinary BMP code point, excluding leading surrogates.
       // BMP uses a single level lookup.  BMP index starts at offset 0 in the index.
       // data is stored in the index array itself.
-      index = (this.data[codePoint >> SHIFT_2] << INDEX_SHIFT) + (codePoint & DATA_MASK);
-      return this.data[index];
+      index = (this.data.getUint32((codePoint >> SHIFT_2) * 4) << INDEX_SHIFT) + (codePoint & DATA_MASK);
+      return this.data.getUint32(index * 4);
     }
 
     if (codePoint <= 0xffff) {
@@ -112,19 +112,19 @@ class UnicodeTrie {
       // lead surrogate code units and code points.
       //   The main index has the code unit data.
       //   For this function, we need the code point data.
-      index = (this.data[LSCP_INDEX_2_OFFSET + ((codePoint - 0xd800) >> SHIFT_2)] << INDEX_SHIFT) + (codePoint & DATA_MASK);
-      return this.data[index];
+      index = (this.data.getUint32((LSCP_INDEX_2_OFFSET + ((codePoint - 0xd800) >> SHIFT_2)) * 4) << INDEX_SHIFT) + (codePoint & DATA_MASK);
+      return this.data.getUint32(index * 4);
     }
 
     if (codePoint < this.highStart) {
       // Supplemental code point, use two-level lookup.
-      index = this.data[(INDEX_1_OFFSET - OMITTED_BMP_INDEX_1_LENGTH) + (codePoint >> SHIFT_1)];
-      index = this.data[index + ((codePoint >> SHIFT_2) & INDEX_2_MASK)];
+      index = this.data.getUint32(((INDEX_1_OFFSET - OMITTED_BMP_INDEX_1_LENGTH) + (codePoint >> SHIFT_1)) * 4);
+      index = this.data.getUint32((index + ((codePoint >> SHIFT_2) & INDEX_2_MASK)) * 4);
       index = (index << INDEX_SHIFT) + (codePoint & DATA_MASK);
-      return this.data[index];
+      return this.data.getUint32(index * 4);
     }
 
-    return this.data[this.data.length - DATA_GRANULARITY];
+    return this.data.getUint32(((this.data.byteLength / 4) - DATA_GRANULARITY) * 4);
   }
 }
 

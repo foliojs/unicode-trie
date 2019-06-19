@@ -884,21 +884,22 @@ class UnicodeTrieBuilder {
 
     // calculate the sizes of, and allocate, the index and data arrays
     const indexLength = allIndexesLength + this.dataLength;
-    const data = new Int32Array(indexLength);
+    const buffer = new ArrayBuffer(indexLength * 4);
+    const data = new DataView(buffer);
 
     // write the index-2 array values shifted right by INDEX_SHIFT, after adding dataMove
     let destIdx = 0;
     for (i = 0; i < INDEX_2_BMP_LENGTH; i++) {
-      data[destIdx++] = ((this.index2[i] + dataMove) >> INDEX_SHIFT);
+      data.setUint32(destIdx++ * 4, ((this.index2[i] + dataMove) >> INDEX_SHIFT));
     }
 
     // write UTF-8 2-byte index-2 values, not right-shifted
     for (i = 0; i < 0xc2 - 0xc0; i++) { // C0..C1
-      data[destIdx++] = (dataMove + BAD_UTF8_DATA_OFFSET);
+      data.setUint32(destIdx++ * 4, (dataMove + BAD_UTF8_DATA_OFFSET));
     }
 
     for (i = i; i < 0xe0 - 0xc0; i++) { // C2..DF
-      data[destIdx++] = (dataMove + this.index2[i << (6 - SHIFT_2)]);
+      data.setUint32(destIdx++ * 4, (dataMove + this.index2[i << (6 - SHIFT_2)]));
     }
 
     if (this.highStart > 0x10000) {
@@ -907,19 +908,19 @@ class UnicodeTrieBuilder {
 
       // write 16-bit index-1 values for supplementary code points
       for (i = 0; i < index1Length; i++) {
-        data[destIdx++] = (INDEX_2_OFFSET + this.index1[i + OMITTED_BMP_INDEX_1_LENGTH]);
+        data.setUint32(destIdx++ * 4, (INDEX_2_OFFSET + this.index1[i + OMITTED_BMP_INDEX_1_LENGTH]));
       }
 
       // write the index-2 array values for supplementary code points,
       // shifted right by INDEX_SHIFT, after adding dataMove
       for (i = 0; i < this.index2Length - index2Offset; i++) {
-        data[destIdx++] = ((dataMove + this.index2[index2Offset + i]) >> INDEX_SHIFT);
+        data.setUint32(destIdx++ * 4, ((dataMove + this.index2[index2Offset + i]) >> INDEX_SHIFT));
       }
     }
 
     // write 16-bit data values
     for (i = 0; i < this.dataLength; i++) {
-      data[destIdx++] = this.data[i];
+      data.setUint32(destIdx++ * 4, this.data[i]);
     }
 
     const dest = new UnicodeTrie({
