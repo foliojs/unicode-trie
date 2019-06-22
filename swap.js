@@ -1,7 +1,7 @@
 const isBigEndian = () => {
   return (new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12);
 };
-
+const isBigEndian = (new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12)
 const swap = (b, n, m) => {
   let i = b[n];
   b[n] = b[m];
