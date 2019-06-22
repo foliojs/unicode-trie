@@ -1,6 +1,4 @@
-const isLittleEndian = () => {
-  return (new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x78);
-};
+const isLittleEndian = (new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x78);
 
 const swap = (b, n, m) => {
   let i = b[n];
@@ -17,7 +15,7 @@ const swap32 = array => {
 };
 
 const swap32BE = array => {
-  if (isLittleEndian()) {
+  if (isLittleEndian) {
     swap32(array);
   }
 };
