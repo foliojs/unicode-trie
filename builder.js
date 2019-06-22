@@ -950,7 +950,7 @@ class UnicodeTrieBuilder {
     let compressed = pako.deflateRaw(data);
     compressed = pako.deflateRaw(compressed);
 
-    const buf = new Buffer(compressed.length + 12);
+    const buf = Buffer.alloc(compressed.length + 12);
     buf.writeUInt32BE(trie.highStart, 0);
     buf.writeUInt32BE(trie.errorValue, 4);
     buf.writeUInt32BE(data.length, 8);
