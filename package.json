@@ -1,6 +1,6 @@
 {
   "name": "unicode-trie",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Unicode Trie data structure for fast character metadata lookup, ported from ICU",
   "devDependencies": {
     "mocha": "^6.1.4",
