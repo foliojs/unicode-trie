@@ -52,6 +52,15 @@ describe('unicode trie', () => {
     assert.equal(trie.get(0x110000), 666);
   });
 
+  it('toBuffer written in little-endian', () => {
+    const trie = new UnicodeTrieBuilder();
+    trie.set(0x4567, 99);
+
+    const buf = trie.toBuffer();
+    const bufferExpected = new Buffer.from([0, 72, 0, 0, 0, 0, 0, 0, 128, 36, 0, 0, 123, 123, 206, 144, 235, 128, 2, 143, 67, 96, 225, 171, 23, 55, 54, 38, 231, 47, 44, 127, 233, 90, 109, 194, 92, 246, 126, 197, 131, 223, 31, 56, 102, 78, 154, 20, 108, 117, 88, 244, 93, 192, 190, 218, 229, 156, 12, 107, 86, 235, 125, 96, 102, 0, 129, 15, 239, 109, 219, 204, 58, 151, 92, 52, 126, 152, 198, 14, 0]);
+    assert.equal(buf.toString('hex'), bufferExpected.toString('hex'));
+  });
+
   it('should work with compressed serialization format', () => {
     const t = new UnicodeTrieBuilder(10, 666);
     t.setRange(13, 6666, 7788, false);

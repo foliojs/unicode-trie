@@ -1,4 +1,5 @@
 const inflate = require('tiny-inflate');
+const { swap32LE } = require('./swap');
 
 // Shift size for getting the index-1 table offset.
 const SHIFT_1 = 6 + 5;
@@ -70,21 +71,25 @@ class UnicodeTrie {
       // read binary format
       let uncompressedLength;
       if (isBuffer) {
-        this.highStart = data.readUInt32BE(0);
-        this.errorValue = data.readUInt32BE(4);
-        uncompressedLength = data.readUInt32BE(8);
+        this.highStart = data.readUInt32LE(0);
+        this.errorValue = data.readUInt32LE(4);
+        uncompressedLength = data.readUInt32LE(8);
         data = data.slice(12);
       } else {
         const view = new DataView(data.buffer);
-        this.highStart = view.getUint32(0);
-        this.errorValue = view.getUint32(4);
-        uncompressedLength = view.getUint32(8);
+        this.highStart = view.getUint32(0, true);
+        this.errorValue = view.getUint32(4, true);
+        uncompressedLength = view.getUint32(8, true);
         data = data.subarray(12);
       }
 
       // double inflate the actual trie data
       data = inflate(data, new Uint8Array(uncompressedLength));
       data = inflate(data, new Uint8Array(uncompressedLength));
+
+      // swap bytes from little-endian
+      swap32LE(data);
+
       this.data = new Uint32Array(data.buffer);
 
     } else {
