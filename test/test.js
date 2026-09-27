@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { inflateSync } from 'fflate';
 import { UnicodeTrieBuilder } from '../builder.js';
 import { UnicodeTrie } from '../index.js';
 
@@ -53,12 +54,21 @@ describe('unicode trie', () => {
   });
 
   it('toBuffer written in little-endian', () => {
-    const trie = new UnicodeTrieBuilder();
-    trie.set(0x4567, 99);
+    const trie = new UnicodeTrieBuilder(0, 0x12345678);
+    trie.set(0x4567, 0x01020304);
 
+    const frozen = trie.freeze();
     const buf = trie.toBuffer();
-    const bufferExpected = new Buffer.from([0, 72, 0, 0, 0, 0, 0, 0, 128, 36, 0, 0, 123, 123, 206, 144, 235, 128, 2, 143, 67, 224, 203, 43, 27, 147, 143, 247, 237, 117, 173, 22, 215, 127, 117, 145, 167, 99, 243, 226, 166, 247, 135, 149, 83, 188, 214, 41, 47, 181, 182, 121, 200, 91, 123, 63, 147, 137, 225, 245, 47, 177, 31, 140, 12, 32, 32, 161, 157, 254, 217, 95, 105, 229, 84, 245, 59, 107, 0]);
-    assert.equal(buf.toString('hex'), bufferExpected.toString('hex'));
+    assert.equal(buf.readUInt32LE(0), frozen.highStart);
+    assert.deepStrictEqual([...buf.subarray(4, 8)], [0x78, 0x56, 0x34, 0x12]);
+    assert.equal(buf.readUInt32LE(8), frozen.data.byteLength);
+
+    const data = inflateSync(buf.subarray(12));
+    assert.equal(data.byteLength, frozen.data.byteLength);
+    const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    for (let i = 0; i < frozen.data.length; i++) {
+      assert.equal(view.getInt32(i * 4, true), frozen.data[i], `word ${i}`);
+    }
   });
 
   it('should work with compressed serialization format', () => {
