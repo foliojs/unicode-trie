@@ -1,4 +1,4 @@
-import { inflateSync } from 'fflate';
+import { inflateSync } from '#zlib';
 import { swap32LE } from './swap.js';
 
 // Shift size for getting the index-1 table offset.
@@ -89,7 +89,7 @@ class UnicodeTrie {
       // swap bytes from little-endian
       swap32LE(data);
 
-      this.data = new Uint32Array(data.buffer);
+      this.data = new Uint32Array(data.buffer, data.byteOffset, data.byteLength / 4);
 
     } else {
       // pre-parsed data

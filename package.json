@@ -8,6 +8,12 @@
     "./builder": "./builder.js",
     "./builder.js": "./builder.js"
   },
+  "imports": {
+    "#zlib": {
+      "node": "./lib/zlib/node.js",
+      "default": "./lib/zlib/browser.js"
+    }
+  },
   "description": "Unicode Trie data structure for fast character metadata lookup, ported from ICU",
   "devDependencies": {
     "mocha": "^12.0.2",

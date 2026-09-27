@@ -1,4 +1,4 @@
-import { deflateSync } from 'fflate';
+import { deflateSync } from '#zlib';
 import { UnicodeTrie } from './index.js';
 import { swap32LE } from './swap.js';
 

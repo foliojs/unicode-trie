@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { inflateSync } from 'fflate';
+import { deflateSync, inflateSync } from '../lib/zlib/browser.js';
 import { UnicodeTrieBuilder } from '../builder.js';
 import { UnicodeTrie } from '../index.js';
 
@@ -69,6 +69,9 @@ describe('unicode trie', () => {
     for (let i = 0; i < frozen.data.length; i++) {
       assert.equal(view.getInt32(i * 4, true), frozen.data[i], `word ${i}`);
     }
+
+    const browserCompressed = Buffer.concat([buf.subarray(0, 12), deflateSync(data)]);
+    assert.equal(new UnicodeTrie(browserCompressed).get(0x4567), 0x01020304);
   });
 
   it('should work with compressed serialization format', () => {
