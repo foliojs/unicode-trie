@@ -1,6 +1,6 @@
-const UnicodeTrie = require('./');
-const { deflateSync } = require('fflate');
-const { swap32LE } = require('./swap');
+import { deflateSync } from 'fflate';
+import { UnicodeTrie } from './index.js';
+import { swap32LE } from './swap.js';
 
 // Shift size for getting the index-1 table offset.
 const SHIFT_1 = 6 + 5;
@@ -963,4 +963,4 @@ class UnicodeTrieBuilder {
   }
 }
 
-module.exports = UnicodeTrieBuilder;
+export { UnicodeTrieBuilder };

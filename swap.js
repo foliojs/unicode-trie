@@ -14,12 +14,8 @@ const swap32 = array => {
   }
 };
 
-const swap32LE = array => {
+export const swap32LE = array => {
   if (isBigEndian) {
     swap32(array);
   }
-};
-
-module.exports = {
-  swap32LE: swap32LE
 };

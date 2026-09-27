@@ -1,6 +1,6 @@
-const assert = require('assert');
-const UnicodeTrieBuilder = require('../builder');
-const UnicodeTrie = require('../');
+import assert from 'assert';
+import { UnicodeTrieBuilder } from '../builder.js';
+import { UnicodeTrie } from '../index.js';
 
 describe('unicode trie', () => {
   it('set', () => {

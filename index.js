@@ -1,5 +1,5 @@
-const { inflateSync } = require('fflate');
-const { swap32LE } = require('./swap');
+import { inflateSync } from 'fflate';
+import { swap32LE } from './swap.js';
 
 // Shift size for getting the index-1 table offset.
 const SHIFT_1 = 6 + 5;
@@ -133,4 +133,4 @@ class UnicodeTrie {
   }
 }
 
-module.exports = UnicodeTrie;
+export { UnicodeTrie };

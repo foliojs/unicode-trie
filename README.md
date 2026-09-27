@@ -30,8 +30,8 @@ for faster runtime performance.  To build a Unicode Trie, use the
 `UnicodeTrieBuilder` class.
 
 ```js
-const UnicodeTrieBuilder = require('unicode-trie/builder');
-const fs = require('fs');
+import { UnicodeTrieBuilder } from 'unicode-trie/builder';
+import fs from 'fs';
 
 // create a trie
 let t = new UnicodeTrieBuilder();
@@ -61,8 +61,8 @@ Once you've built a precompiled trie, you can load it into the
 trie.  From there, you can lookup values.
 
 ```js
-const UnicodeTrie = require('unicode-trie');
-const fs = require('fs');
+import { UnicodeTrie } from 'unicode-trie';
+import fs from 'fs';
 
 // load serialized trie from binary file
 const data = fs.readFileSync('data.trie');
@@ -72,6 +72,17 @@ const trie = new UnicodeTrie(data);
 trie.get(0x4567); // => 99
 ```
 
+## CommonJS Compatibility
+
+The package is published as an ECMAScript module (ESM). To [load it using `require()`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require), Node.js 20.17.0 or later is required.
+
+```js
+// Example of loading the package using require() in Node.js 20.17.0 or higher
+const { UnicodeTrieBuilder } = require('unicode-trie/builder');
+const { UnicodeTrie } = require('unicode-trie');
+const fs = require('fs');
+```
+ 
 ## License
 
 MIT
