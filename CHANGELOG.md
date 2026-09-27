@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 — 2026-09-27
+
 - Replaced `pako` and `tiny-inflate` with `fflate` for trie compression and decompression.
 - Use native `zlib` package in Node
 - [BREAKING CHANGE] Converted the package to native ECMAScript modules with named exports. The package now declares explicit entry points and requires Node.js 20.17.0 or later.
